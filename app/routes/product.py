@@ -4,11 +4,6 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import schemas
 from ..services import product_service  # Importar el servicio
-from sqlalchemy.orm import Session
-from .. import models
-from ..database import get_db
-from sqlalchemy import func
-
 
 router = APIRouter()
 
@@ -63,35 +58,3 @@ def get_products_by_category(
     db: Session = Depends(get_db)
 ):
     return product_service.get_products_by_category(db, category_id)
-
-# GET /api/products/summary
-@router.get("/summary")
-def get_products_summary(db: Session = Depends(get_db)):
-    total_products = db.query(func.count(models.Product.id)).scalar()
-    low_stock = db.query(models.Product).filter(models.Product.stock < 10).count()
-    
-    return {
-        "total": total_products,
-        "lowStock": low_stock
-    }
-
-# GET /api/products/top-selling
-@router.get("/top-selling")
-def get_top_selling_products(db: Session = Depends(get_db)):
-    # Esto sería más eficiente si tienes una tabla de ventas en PostgreSQL
-    # En este ejemplo asumimos que tienes una tabla de ventas
-    top_products = db.query(
-        models.Product.nombre,
-        func.sum(models.SaleItem.quantity).label('total_quantity')
-    ).join(
-        models.SaleItem, models.SaleItem.product_id == models.Product.id
-    ).group_by(
-        models.Product.id
-    ).order_by(
-        func.sum(models.SaleItem.quantity).desc()
-    ).limit(10).all()
-    
-    return [
-        {"name": p[0], "quantity": p[1]} 
-        for p in top_products
-    ]
