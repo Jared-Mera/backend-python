@@ -8,6 +8,7 @@ class ProductBase(BaseModel):
     stock: int
     categoria_id: int
     sku: Optional[str] = None
+    imagen_url: Optional[str] = None
 
 class ProductCreate(ProductBase):
     pass

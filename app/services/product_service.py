@@ -20,7 +20,8 @@ def create_product(db: Session, product: ProductCreate) -> models.Product:
         precio=product.precio,
         stock=product.stock,
         categoria_id=product.categoria_id,
-        sku=product.sku
+        sku=product.sku,
+        imagen_url=product.imagen_url
     )
     
     db.add(db_product)

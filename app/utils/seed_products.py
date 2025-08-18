@@ -4,6 +4,11 @@ from sqlalchemy.orm import Session
 from ..database import SessionLocal
 from ..models import Product, Category
 from faker import Faker
+from ..utils.cloudinary import upload_image  # Añadir
+import tempfile
+import requests
+import os
+import time
 
 def seed_products():
     """
@@ -40,6 +45,21 @@ def seed_products():
         db.close()
         return
     
+    # Lista de imágenes de prueba (URLs públicas)
+    # Reemplazar con URLs funcionales de Picsum
+    sample_images = [
+        "https://picsum.photos/id/1/200/300",
+        "https://picsum.photos/id/10/200/300",
+        "https://picsum.photos/id/100/200/300",
+        "https://picsum.photos/id/1000/200/300",
+        "https://picsum.photos/id/1001/200/300",
+        "https://picsum.photos/id/1002/200/300",
+        "https://picsum.photos/id/1003/200/300",
+        "https://picsum.photos/id/1004/200/300",
+        "https://picsum.photos/id/1005/200/300",
+        "https://picsum.photos/id/1006/200/300",
+    ]
+
     # Generar 200 productos de prueba
     for i in range(1, 201):
         # Seleccionar una categoría aleatoria
@@ -49,20 +69,59 @@ def seed_products():
         product_name = f"Producto {i} - {fake.word().capitalize()}"
         sku_prefix = ''.join([c[0] for c in category.nombre.split()]).upper()
         
-        # Crear producto con datos ficticios
+        random_image_url = random.choice(sample_images)
+        imagen_url = None
+
+        max_retries = 3
+
+        for attempt in range(max_retries):
+            try:
+                # Descargar imagen con timeout
+                response = requests.get(random_image_url, timeout=10)
+                response.raise_for_status()
+                
+                if response.content:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp:
+                        temp.write(response.content)
+                        temp_path = temp.name
+                    
+                    if os.path.getsize(temp_path) > 0:
+                        imagen_url = upload_image(temp_path)
+                    else:
+                        print(f"⚠️ Archivo vacío: {random_image_url}")
+                    os.unlink(temp_path)
+                    break  # Salir del bucle si tiene éxito
+                else:
+                    print(f"⚠️ Contenido vacío en: {random_image_url}")
+                    
+            except Exception as e:
+                print(f"❌ Error en intento {attempt+1}/{max_retries}: {e}")
+                if attempt < max_retries - 1:
+                    # Espera exponencial: 1s, 2s, 4s
+                    sleep_time = 2 ** attempt
+                    print(f"⏳ Esperando {sleep_time}s antes de reintentar...")
+                    time.sleep(sleep_time)
+                else:
+                    print(f"❌ Fallo definitivo con la imagen: {random_image_url}")
+        
+        # Pequeña pausa entre productos para no saturar
+        time.sleep(0.1)
+
+        # Crear producto
         new_product = Product(
             nombre=product_name,
             descripcion=fake.sentence(),
             precio=round(random.uniform(10.0, 1000.0), 2),
             stock=random.randint(0, 100),
             categoria_id=category.id,
-            sku=f"{sku_prefix}-{fake.unique.bothify(text='####-####')}"
+            sku=f"{sku_prefix}-{fake.unique.bothify(text='####-####')}",
+            imagen_url=imagen_url
         )
         
         db.add(new_product)
         
         # Mostrar progreso cada 50 productos
-        if i % 50 == 0:
+        if i % 10 == 0:
             print(f"🔄 Generados {i} productos...")
     
     try:

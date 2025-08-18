@@ -5,6 +5,7 @@ from .database import engine
 from .models import category, product
 from .routes import product as product_routes, category as category_routes
 from .database import get_db
+from .routes import upload
 
 app = FastAPI(
     title="Productos API",
@@ -15,7 +16,10 @@ app = FastAPI(
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",
+        "https://res.cloudinary.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,6 +41,7 @@ async def startup_event():
 # Incluir rutas
 app.include_router(product_routes.router, prefix="/api/products", tags=["products"])
 app.include_router(category_routes.router, prefix="/api/categories", tags=["categories"])
+app.include_router(upload.router, prefix="/api/upload", tags=["upload"])
 
 @app.get("/")
 def root():
@@ -45,3 +50,7 @@ def root():
         "version": app.version,
         "docs": "/docs"
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 10000)), reload=True)

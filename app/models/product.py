@@ -12,6 +12,7 @@ class Product(Base):
     stock = Column(Integer, nullable=False, default=0)
     categoria_id = Column(Integer, ForeignKey('categorias.id'), nullable=False)
     sku = Column(String(50), unique=True)
+    imagen_url = Column(String(255))  # Nueva columna para URL de imagen
     
     def __repr__(self):
         return f"<Product(id={self.id}, nombre='{self.nombre}', precio={self.precio})>"
