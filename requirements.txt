@@ -1,9 +1,11 @@
+# backend-python/requirements.txt
 fastapi
 uvicorn
+gunicorn
 sqlalchemy
 psycopg2-binary
 python-dotenv
 python-multipart
 Pillow
 requests
-gunicorn
+cloudinary
