@@ -32,7 +32,7 @@ def create_product(db: Session, product: ProductCreate) -> models.Product:
 
 def get_product(db: Session, product_id: str) -> models.Product:
     """
-    Obtiene un producto por su ID
+    Obtiene un producto por su ID 
     """
     return db.query(models.Product).filter(models.Product.id == product_id).first()
 
@@ -56,6 +56,7 @@ def update_product(db: Session, product_id: str, product_update: ProductCreate) 
         db.refresh(db_product)
     
     return db_product
+#Eliminar productos
 
 def delete_product(db: Session, product_id: str) -> bool:
     """
@@ -74,6 +75,8 @@ def get_products_by_category(db: Session, category_id: int) -> List[models.Produ
     Obtiene productos por categoría
     """
     return db.query(models.Product).filter(models.Product.categoria_id == category_id).all()
+
+#Buscar productos o producto
 
 def search_products(db: Session, query: str, skip: int = 0, limit: int = 100) -> List[models.Product]:
     """
