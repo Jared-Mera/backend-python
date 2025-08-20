@@ -5,7 +5,7 @@ from ..database import get_db
 from .. import schemas
 from ..services import product_service  # Importar el servicio
 
-#Creamos las rutas de los productos
+# rutas de los productos
 router = APIRouter()
 
 @router.post("/", response_model=schemas.Product, status_code=status.HTTP_201_CREATED)
