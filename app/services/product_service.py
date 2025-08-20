@@ -5,6 +5,7 @@ from ..schemas import ProductCreate, Product
 from ..database import get_db
 from typing import List
 import uuid
+from sqlalchemy import or_
 
 def create_product(db: Session, product: ProductCreate) -> models.Product:
     """
@@ -73,3 +74,15 @@ def get_products_by_category(db: Session, category_id: int) -> List[models.Produ
     Obtiene productos por categoría
     """
     return db.query(models.Product).filter(models.Product.categoria_id == category_id).all()
+
+def search_products(db: Session, query: str, skip: int = 0, limit: int = 100) -> List[models.Product]:
+    """
+    Busca productos por nombre o descripción
+    """
+    return db.query(models.Product).filter(
+        or_(
+            models.Product.nombre.ilike(f"%{query}%"),
+            models.Product.descripcion.ilike(f"%{query}%"),
+            models.Product.sku.ilike(f"%{query}%")
+        )
+    ).offset(skip).limit(limit).all()

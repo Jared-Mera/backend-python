@@ -58,3 +58,12 @@ def get_products_by_category(
     db: Session = Depends(get_db)
 ):
     return product_service.get_products_by_category(db, category_id)
+
+@router.get("/search/", response_model=list[schemas.Product])
+def search_products(
+    query: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    return product_service.search_products(db, query, skip, limit)
