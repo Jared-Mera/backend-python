@@ -131,6 +131,7 @@ def delete_category(db: Session, category_id: int) -> bool:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No se puede eliminar una categoría con productos asociados"
         )
+
     
     db.delete(db_category)
     db.commit()
