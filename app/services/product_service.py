@@ -29,7 +29,7 @@ def create_product(db: Session, product: ProductCreate) -> models.Product:
     db.commit()
     db.refresh(db_product)
     return db_product
-#Obtener producto por ID
+#Obtener  por ID
 
 def get_product(db: Session, product_id: str) -> models.Product:
     """
@@ -42,6 +42,8 @@ def get_products(db: Session, skip: int = 0, limit: int = 100) -> List[models.Pr
     Obtiene una lista de productos con paginación
     """
     return db.query(models.Product).offset(skip).limit(limit).all()
+
+#Actualiza
 
 def update_product(db: Session, product_id: str, product_update: ProductCreate) -> models.Product:
     """
