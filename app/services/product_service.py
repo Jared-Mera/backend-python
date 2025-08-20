@@ -29,6 +29,7 @@ def create_product(db: Session, product: ProductCreate) -> models.Product:
     db.commit()
     db.refresh(db_product)
     return db_product
+#Obtener producto por ID
 
 def get_product(db: Session, product_id: str) -> models.Product:
     """
@@ -69,7 +70,7 @@ def delete_product(db: Session, product_id: str) -> bool:
         db.commit()
         return True
     return False
-
+#Obtiene Productos
 def get_products_by_category(db: Session, category_id: int) -> List[models.Product]:
     """
     Obtiene productos por categoría
