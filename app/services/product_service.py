@@ -31,6 +31,23 @@ def create_product(db: Session, product: ProductCreate) -> models.Product:
     return db_product
 #Obtener  por ID
 
+def update_product_stock(db: Session, product_id: str, cantidad: int) -> bool:
+    """
+    Actualiza el stock de un producto después de una venta.
+    """
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    
+    if db_product:
+        # Verificamos si hay suficiente stock
+        if db_product.stock < cantidad:
+            return False  # No hay suficiente stock
+        # Reducir el stock
+        db_product.stock -= cantidad
+        db.commit()
+        db.refresh(db_product)
+        return True
+    return False
+
 def get_product(db: Session, product_id: str) -> models.Product:
     """
     Obtiene un producto por su ID 
